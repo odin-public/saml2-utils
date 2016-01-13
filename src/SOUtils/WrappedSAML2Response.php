@@ -1,11 +1,11 @@
 <?php
 
+namespace SOUtils;
+
 require_once('LibsLoader.php');
 require_once('IncorrectFieldException.php');
 require_once('SAMLConstants.php');
 require_once('XMLConverter.php');
-
-namespace SOUtils;
 
 // Wraps original SAML2 Response object for provides short call ways to get neccessary attributes
 class WrappedSAML2Response {
