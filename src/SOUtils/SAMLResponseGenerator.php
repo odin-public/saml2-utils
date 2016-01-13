@@ -1,12 +1,11 @@
 <?php
 
-require_once('libs_loader.php');
-require_once('saml_constants.php');
-require_once('xml_converter.php');
+require_once('LibsLoader.php');
+require_once('MissingValueException.php');
+require_once('SAMLConstants.php');
+require_once('XMLConverter.php');
 
 namespace SOUtils;
-
-class MissingValueException extends Exception {}
 
 class SAMLResponseGenerator {
     // Generates NameID value which could be sent to SAML2 lib generators

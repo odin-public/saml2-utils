@@ -1,12 +1,11 @@
 <?php
 
-require_once('libs_loader.php');
-require_once('saml_constants.php');
-require_once('xml_converter.php');
+require_once('LibsLoader.php');
+require_once('IncorrectFieldException.php');
+require_once('SAMLConstants.php');
+require_once('XMLConverter.php');
 
 namespace SOUtils;
-
-class IncorrectFieldException extends Exception {}
 
 // Wraps original SAML2 Response object for provides short call ways to get neccessary attributes
 class WrappedSAML2Response {
