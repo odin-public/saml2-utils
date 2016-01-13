@@ -144,7 +144,7 @@ class SAMLResponseGenerator {
 
         if (self::need_sign($values)) {
             if (array_key_exists('SHA256KeyFile', $values)) {
-                $ekey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, array('type' => 'private'));
+                $ekey = new \XMLSecurityKey(\XMLSecurityKey::RSA_SHA256, array('type' => 'private'));
                 $ekey->loadKey($values['SHA256KeyFile'], true);
 
                 if (self::need_sign_attributes($values)) $assertion->setSignatureKey($ekey);
