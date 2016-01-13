@@ -8,23 +8,19 @@
         {
             "name": "Gleb Y. Averchuk",
             "email": "gaverchuk@odin.com"
-        },
-        {
-            "name": "Alexey Kuzin",
-            "email": "akuzin@odin.com"
-        }
-    ],
-
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/odin-public/saml2.git"
         }
     ],
 
     "require": {
-        "php": ">=5.3",
+        "php": ">=5.3.3",
         "phpseclib/phpseclib": "0.3.10",
-        "simplesamlphp/saml2": "dev-master"
+        "simplesamlphp/saml2": "1.7.*"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "SimpleSAML_": "src/",
+            "utils": "src/"
+        }
     }
 }
