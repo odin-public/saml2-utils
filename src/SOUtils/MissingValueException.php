@@ -2,6 +2,6 @@
 
 namespace SOUtils;
 
-class MissingValueException extends Exception {}
+class MissingValueException extends \Exception {}
 
 ?>

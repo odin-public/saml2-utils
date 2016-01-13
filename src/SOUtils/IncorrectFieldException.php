@@ -2,6 +2,6 @@
 
 namespace SOUtils;
 
-class IncorrectFieldException extends Exception {}
+class IncorrectFieldException extends \Exception {}
 
 ?>
