@@ -1,5 +1,7 @@
 <?php
 
+namespace SOUtils;
+
 class SmartRequire {
     private $root_dir;
 

@@ -4,6 +4,8 @@ require_once('libs_loader.php');
 require_once('saml_constants.php');
 require_once('xml_converter.php');
 
+namespace SOUtils;
+
 class MissingValueException extends Exception {}
 
 class SAMLResponseGenerator {

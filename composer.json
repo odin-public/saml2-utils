@@ -20,7 +20,7 @@
     "autoload": {
         "psr-0": {
             "SimpleSAML_": "src/",
-            "utils": "src/"
+            "SOUtils\\": "src/"
         }
     }
 }

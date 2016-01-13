@@ -1,5 +1,7 @@
 <?php
 
+namespace SOUtils;
+
 class XMLConverter {
     // Converts passed string to XML element object
     // @param [string] $str with raw XML
