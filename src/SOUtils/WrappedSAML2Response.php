@@ -16,7 +16,7 @@ class WrappedSAML2Response {
     // @param $str with xml which describes request
     public function __construct($str) {
         $this->xml = XMLConverter::str_to_xml($str);
-        $this->saml = new SAML2_Response(XMLConverter::str_to_xml($str));
+        $this->saml = new \SAML2_Response(XMLConverter::str_to_xml($str));
     }
 
     // @return [string]
@@ -141,7 +141,7 @@ class WrappedSAML2Response {
         return $status['Code'];
     }
 
-    // @return [SAML2_Assertion]
+    // @return [\SAML2_Assertion]
     protected function assertion() {
         $assertions = $this->saml->getAssertions();
         if (count($assertions) != 1) {
@@ -151,7 +151,7 @@ class WrappedSAML2Response {
         return $assertions[0];
     }
 
-    // @return [SAML2_XML_saml_SubjectConfirmationData]
+    // @return [\SAML2_XML_saml_SubjectConfirmationData]
     private function confirmation_data() {
         $confirmations = $this->assertion()->getSubjectConfirmation();
         if (count($confirmations) != 1) {

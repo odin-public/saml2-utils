@@ -71,8 +71,8 @@ class SAMLResponseGenerator {
     }
 
     private static function make_saml_response(array $values) {
-        $saml = new SAML2_Response();
-        $assertion = new SAML2_Assertion();
+        $saml = new \SAML2_Response();
+        $assertion = new \SAML2_Assertion();
 
         if (self::original_spid_isset($values)) {
             $saml->setInResponseTo($values['InResponseTo']);
@@ -122,9 +122,9 @@ class SAMLResponseGenerator {
         }
 
         if (self::original_spid_isset($values) || array_key_exists('Destination', $values)) {
-            $confirmation = new SAML2_XML_saml_SubjectConfirmation();
+            $confirmation = new \SAML2_XML_saml_SubjectConfirmation();
             $confirmation->Method = SAML_CONFIGURATION_METHOD;
-            $confirmation->SubjectConfirmationData = new SAML2_XML_saml_SubjectConfirmationData();
+            $confirmation->SubjectConfirmationData = new \SAML2_XML_saml_SubjectConfirmationData();
             $confirmation->SubjectConfirmationData->NotOnOrAfter = $not_on_or_after_time;
 
             if (array_key_exists('Destination', $values)) {
