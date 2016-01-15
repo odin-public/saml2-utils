@@ -9,7 +9,7 @@ require_once('MissingValueException.php');
 require_once('SAMLConstants.php');
 require_once('XMLConverter.php');
 
-class SAMLResponseGenerator {
+class SAML2ResponseGenerator {
     // Generates NameID value which could be sent to SAML2 lib generators
     // @param [string] $value of NameID field
     // @return [array] the value which contain correct format of NameID field
