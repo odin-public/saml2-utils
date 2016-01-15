@@ -6,7 +6,7 @@ define('DEFAULT_RESPONSE_TIME_DELTA', 300); // 5 min
 
 require_once('LibsLoader.php');
 require_once('MissingValueException.php');
-require_once('SAMLConstants.php');
+require_once('SAML2Constants.php');
 require_once('XMLConverter.php');
 
 class SAML2ResponseGenerator {

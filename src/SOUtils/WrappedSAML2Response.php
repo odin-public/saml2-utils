@@ -4,7 +4,7 @@ namespace SOUtils;
 
 require_once('LibsLoader.php');
 require_once('IncorrectFieldException.php');
-require_once('SAMLConstants.php');
+require_once('SAML2Constants.php');
 require_once('XMLConverter.php');
 
 // Wraps original SAML2 Response object for provides short call ways to get neccessary attributes
