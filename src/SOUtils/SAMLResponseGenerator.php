@@ -2,6 +2,8 @@
 
 namespace SOUtils;
 
+define('DEFAULT_RESPONSE_TIME_DELTA', 300); // 5 min
+
 require_once('LibsLoader.php');
 require_once('MissingValueException.php');
 require_once('SAMLConstants.php');
@@ -18,9 +20,19 @@ class SAMLResponseGenerator {
         );
     }
 
+    // Modifies the passed original SAML Response
+    // @param [string] $original_response_str the SAML Response which should be modified
+    // @param $values is the configuration array which should contain all necessary data
+    // @return [string] the XML string with generated SAML Response
+    public static function modify_response($original_response_str, array $values) {
+        $original_response = new \SAML2_Response(XMLConverter::str_to_xml($original_response_str));
+        $modified_response = self::combine_response($values, $original_response);
+        return self::to_str($modified_response, $values);
+    }
+
     // Generates XML string which contains SAML Response
     // @param $values is the configuration array which should contain all necessary data
-    // @return [string] the XML string
+    // @return [string] the XML string with generated SAML Response
     public static function generate(array $values) {
         if (empty($values)) {
             throw new MissingValueException('Passed values could not be empty');
@@ -53,7 +65,7 @@ class SAMLResponseGenerator {
                 }
             } else {
                 if (array_key_exists('SHA256KeyFile', $values) || array_key_exists('SHA256CertFile', $values)) {
-                    throw new MissingValueException('Certificate file passed, but any response sign off');
+                    throw new MissingValueException('Certificate file passed, but any sign off');
                 }
             }
         }
@@ -63,23 +75,37 @@ class SAMLResponseGenerator {
 
     // Generates XML string without checking that all necessary values are set
     // @param $values is the configuration array
-    // @return [string] the XML string
+    // @return [string] the XML string with generated SAML Response
     public static function safe_generate(array $values) {
-        $saml = self::make_saml_response($values);
-        $xml = self::need_sign($values) ? $saml->toSignedXML() : $saml->toUnsignedXML();
+        $response = self::combine_response($values);
+        return self::to_str($response, $values);
+    }
+
+    // Checks that passed SAML Response should be signed or not by passed values
+    // and converts it to XML string
+    // @param $response which will be converted to XML string
+    // @param $values is the configuration array
+    // @return [string] the XML string with generated SAML Response
+    private static function to_str(\SAML2_Response $response, array $values) {
+        $xml = self::need_sign($values) ? $response->toSignedXML() : $response->toUnsignedXML();
         return XMLConverter::xml_to_str($xml);
     }
 
-    private static function make_saml_response(array $values) {
-        $saml = new \SAML2_Response();
-        $assertion = new \SAML2_Assertion();
+    // Combines the SAML Response by passed configuration array
+    // @param $values is the configuration array
+    // @param $response which will be modified if passed
+    // @return [\SAML2_Response] the (re)combined SAML Response
+    private static function combine_response(array $values, \SAML2_Response $response = NULL) {
+        if (!isset($response)) $response = new \SAML2_Response();
+        $presented_assertions = $response->getAssertions();
+        $assertion = empty($presented_assertions) ? new \SAML2_Assertion() : $presented_assertions[0];
 
         if (self::original_spid_isset($values)) {
-            $saml->setInResponseTo($values['InResponseTo']);
+            $response->setInResponseTo($values['InResponseTo']);
         }
 
         if (array_key_exists('ResponseID', $values)) {
-            $saml->setId($values['ResponseID']);
+            $response->setId($values['ResponseID']);
         }
 
         if (array_key_exists('AssertionID', $values)) {
@@ -87,7 +113,7 @@ class SAMLResponseGenerator {
         }
 
         if (array_key_exists('Issuer', $values)) {
-            $saml->setIssuer($values['Issuer']);
+            $response->setIssuer($values['Issuer']);
             $assertion->setIssuer($values['Issuer']);
         }
 
@@ -101,7 +127,7 @@ class SAMLResponseGenerator {
             $assertion->setNotBefore(time() - $values['AllowedTimeDelta']);
             $assertion->setNotOnOrAfter($not_on_or_after_time);
         } else {
-            $not_on_or_after_time += RESPONSE_TIME_DELTA;
+            $not_on_or_after_time += DEFAULT_RESPONSE_TIME_DELTA;
         }
 
         if (array_key_exists('Audience', $values)) {
@@ -139,7 +165,7 @@ class SAMLResponseGenerator {
         }
 
         if (array_key_exists('Destination', $values)) {
-            $saml->setDestination($values['Destination']);
+            $response->setDestination($values['Destination']);
         }
 
         if (self::need_sign($values)) {
@@ -148,19 +174,19 @@ class SAMLResponseGenerator {
                 $ekey->loadKey($values['SHA256KeyFile'], true);
 
                 if (self::need_sign_attributes($values)) $assertion->setSignatureKey($ekey);
-                if (self::need_sign_message($values)) $saml->setSignatureKey($ekey);
+                if (self::need_sign_message($values)) $response->setSignatureKey($ekey);
             }
 
             if (array_key_exists('SHA256CertFile', $values)) {
                 $certifictaes = array(file_get_contents($values['SHA256CertFile']));
 
                 if (self::need_sign_attributes($values)) $assertion->setCertificates($certifictaes);
-                if (self::need_sign_message($values)) $saml->setCertificates($certifictaes);
+                if (self::need_sign_message($values)) $response->setCertificates($certifictaes);
             }
         }
 
-        $saml->setAssertions(array($assertion));
-        return $saml;
+        $response->setAssertions(array($assertion));
+        return $response;
     }
 
     // Checks that passed values contains InResponseTo field

@@ -9,21 +9,19 @@ require_once('XMLConverter.php');
 
 // Wraps original SAML2 Response object for provides short call ways to get neccessary attributes
 class WrappedSAML2Response {
-    protected $xml;
-    private $saml;
+    private $response;
 
     // Initializes authn response by xml
     // @param $str with xml which describes request
     public function __construct($str) {
-        $this->xml = XMLConverter::str_to_xml($str);
-        $this->saml = new \SAML2_Response(XMLConverter::str_to_xml($str));
+        $this->response = new \SAML2_Response(XMLConverter::str_to_xml($str));
     }
 
     // @return [string]
     public function get_destination() {
-        $destination = $this->saml->getDestination();
+        $destination = $this->response->getDestination();
         if ($destination === NULL) {
-            throw new IncorrectFieldException('Destination could not be found');
+            throw new IncorrectFieldException('Destination cannot be found');
         }
 
         return $destination;
@@ -33,17 +31,27 @@ class WrappedSAML2Response {
     public function get_recipient() {
         $recipient = $this->confirmation_data()->Recipient;
         if ($recipient === NULL) {
-            throw new IncorrectFieldException('Recipient could not be found');
+            throw new IncorrectFieldException('Recipient cannot be found');
         }
 
         return $recipient;
     }
 
     // @return [string]
+    public function get_in_response_to() {
+        $value = $this->response->getInResponseTo();
+        if (empty($value)) {
+            throw new IncorrectFieldException('Value of InResponseTo field cannot be found');
+        }
+
+        return $value;
+    }
+
+    // @return [string]
     public function get_response_id() {
-        $id = $this->saml->getId();
+        $id = $this->response->getId();
         if (empty($id)) {
-            throw new IncorrectFieldException('Response ID could not be found');
+            throw new IncorrectFieldException('Response ID cannot be found');
         }
 
         return $id;
@@ -53,7 +61,7 @@ class WrappedSAML2Response {
     public function get_assertion_id() {
         $id = $this->assertion()->getId();
         if (empty($id)) {
-            throw new IncorrectFieldException('Assertion ID could not be found');
+            throw new IncorrectFieldException('Assertion ID cannot be found');
         }
 
         return $id;
@@ -63,7 +71,7 @@ class WrappedSAML2Response {
     public function get_name_id() {
         $name_id = $this->assertion()->getNameId();
         if (empty($name_id) || $name_id['Value'] === NULL) {
-            throw new IncorrectFieldException('Name ID value could not be found');
+            throw new IncorrectFieldException('Name ID value cannot be found');
         }
 
         return $name_id['Value'];
@@ -73,7 +81,7 @@ class WrappedSAML2Response {
     public function get_session_index() {
         $session_index = $this->assertion()->getSessionIndex();
         if ($session_index === NULL) {
-            throw new IncorrectFieldException('Session index could not be found');
+            throw new IncorrectFieldException('Session index cannot be found');
         }
 
         return $session_index;
@@ -93,7 +101,7 @@ class WrappedSAML2Response {
     public function get_authn_context_class_ref() {
         $context_class_ref = $this->assertion()->getAuthnContextClassRef();
         if ($context_class_ref === NULL) {
-            throw new IncorrectFieldException('Authentication context class reference could not be found');
+            throw new IncorrectFieldException('Authentication context class reference cannot be found');
         }
 
         return $context_class_ref;
@@ -113,7 +121,7 @@ class WrappedSAML2Response {
         } else if (!$is_required) {
             return array('');
         } else {
-            throw new IncorrectFieldException('Attribute "' . $name . '" could not be found');
+            throw new IncorrectFieldException('Attribute "' . $name . '" cannot be found');
         }
     }
 
@@ -133,9 +141,9 @@ class WrappedSAML2Response {
 
     // @return [string]
     protected function get_status() {
-        $status = $this->saml->getStatus();
+        $status = $this->response->getStatus();
         if (empty($status)) {
-            throw new IncorrectFieldException('Status could not be found');
+            throw new IncorrectFieldException('Status cannot be found');
         }
 
         return $status['Code'];
@@ -143,7 +151,7 @@ class WrappedSAML2Response {
 
     // @return [\SAML2_Assertion]
     protected function assertion() {
-        $assertions = $this->saml->getAssertions();
+        $assertions = $this->response->getAssertions();
         if (count($assertions) != 1) {
             throw new IncorrectFieldException('Incorrect number of assertions');
         }
@@ -160,7 +168,7 @@ class WrappedSAML2Response {
 
         $confirmation = $confirmations[0];
         if ($confirmation->SubjectConfirmationData === NULL) {
-            throw new IncorrectFieldException('Subject confirmation data could not be found');
+            throw new IncorrectFieldException('Subject confirmation data cannot be found');
         }
 
         return $confirmation->SubjectConfirmationData;
