@@ -18,6 +18,16 @@ class WrappedSAML2Response {
     }
 
     // @return [string]
+    public function get_issuer() {
+        $issuer = $this->response->getIssuer();
+        if ($issuer === NULL) {
+            throw new IncorrectFieldException('Issuer cannot be found');
+        }
+
+        return $issuer;
+    }
+
+    // @return [string]
     public function get_destination() {
         $destination = $this->response->getDestination();
         if ($destination === NULL) {
