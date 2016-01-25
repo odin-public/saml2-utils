@@ -148,19 +148,36 @@ class SAML2ResponseGenerator {
         }
 
         if (self::original_spid_isset($values) || array_key_exists('Destination', $values)) {
-            $confirmation = new \SAML2_XML_saml_SubjectConfirmation();
-            $confirmation->Method = SAML_CONFIGURATION_METHOD;
-            $confirmation->SubjectConfirmationData = new \SAML2_XML_saml_SubjectConfirmationData();
-            $confirmation->SubjectConfirmationData->NotOnOrAfter = $not_on_or_after_time;
+            $original_confirmations = $assertion->getSubjectConfirmation();
+            $confirmation = NULL;
+            if (empty($original_confirmations)) {
+                $confirmation = new \SAML2_XML_saml_SubjectConfirmation();
+                $confirmation->Method = SAML_CONFIGURATION_METHOD;
+            } else {
+                $confirmation = $original_confirmations[0];
+            }
+
+            $original_data = $confirmation->SubjectConfirmationData;
+            $data = NULL;
+            if (empty($original_data)) {
+                $data = new \SAML2_XML_saml_SubjectConfirmationData();
+                $data->NotOnOrAfter = $not_on_or_after_time;
+            } else {
+                $data = $original_data;
+                if (empty($data->NotOnOrAfter)) {
+                    $data->NotOnOrAfter = $not_on_or_after_time;
+                }
+            }
 
             if (array_key_exists('Destination', $values)) {
-                $confirmation->SubjectConfirmationData->Recipient = $values['Destination'];
+                $data->Recipient = $values['Destination'];
             }
 
             if (self::original_spid_isset($values)) {
-                $confirmation->SubjectConfirmationData->InResponseTo = $values['InResponseTo'];
+                $data->InResponseTo = $values['InResponseTo'];
             }
 
+            $confirmation->SubjectConfirmationData = $data;
             $assertion->setSubjectConfirmation(array($confirmation));
         }
 
