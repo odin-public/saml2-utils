@@ -149,6 +149,16 @@ class WrappedSAML2Response {
         return $this->assertion()->getAttributes();
     }
 
+    // @return [array]
+    public function get_not_before() {
+        return $this->assertion()->getNotBefore();
+    }
+
+    // @return [array]
+    public function get_not_on_or_after() {
+        return $this->assertion()->getNotOnOrAfter();
+    }
+
     // @return [string]
     protected function get_status() {
         $status = $this->response->getStatus();
