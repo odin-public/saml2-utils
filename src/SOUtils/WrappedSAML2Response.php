@@ -193,6 +193,14 @@ class WrappedSAML2Response {
 
         return $confirmation->SubjectConfirmationData;
     }
+
+    // @return [array]
+    public function certificates() {
+        return array_unique(array_merge(
+            $this->response->getCertificates(),
+            $this->assertion()->getCertificates()
+        ));
+    }
 }
 
 ?>
